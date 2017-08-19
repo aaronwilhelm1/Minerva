@@ -1,0 +1,1 @@
+Minerva is a language learning tool to simplify reading texts in foreign languages and improve vocabulary aquisition.
