@@ -1,4 +1,6 @@
 from Tkinter import Tk, Label, Button, Frame, Entry, Text, X, END
+from library import Library
+from article import Article
 
 
 canvas_width = 700
@@ -35,6 +37,8 @@ class GUI:
         #default to the import page
         self.update("import")
 
+        self.lib = Library()
+
     def update(self, method):
         self.status = method
         if(method == "import"):
@@ -62,8 +66,7 @@ class GUI:
 
     def contentListener(self, action):
         if(action == "add"):
-            print(self.titleEntry.get())
-            print(self.text.get(1.0, END))
+            self.lib.addArticle(Article(self.titleEntry.get(), self.text.get(1.0, END)))
 
 
 root = Tk()
