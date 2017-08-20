@@ -1,22 +1,39 @@
-#from article import Article
+from article import Article
+import cPickle
+import os.path
+
+artFolderName = "articles/"
 
 
 class Library():
     def __init__(self):
+        # starts off empty but is added to as articles are read from memory
         self.lib = {}
-        # art1 = Article("Title 1", "Text 1")
-        # art2 = Article("Title 2", "Text 2")
-        # self.lib[art1.getTitle()] = art1
-        # self.lib[art2.getTitle()] = art2
 
     def addArticle(self, article):
         self.lib[article.getTitle()] = article
+        f = open(artFolderName + article.getTitle(), 'w')
+        cPickle.dump(article, f)
+        f.close()
 
+    # each time an article is added, it is stored in the hashmap for quick look-up later
     def getArticle(self, articleTitle):
-        return self.lib[articleTitle]
+        if articleTitle in self.lib:
+            return self.lib[articleTitle]
+        else:
+            if self.hasArticle(articleTitle):
+                f = open(artFolderName + articleTitle, 'r')
+                self.lib[articleTitle] = cPickle.load(f)
+                f.close()
+                return self.lib[articleTitle]
+            else:
+                print("ERROR: Could not find an article titled: " + articleTitle)
 
     def hasArticle(self, articleTitle):
-        return articleTitle in self.lib
+        if articleTitle in self.lib:
+            return True
+        else:
+            return os.path.isfile(artFolderName + articleTitle)
 
     #prints all of the info at once. Used for debugging purposes
     def dump(self):
@@ -31,5 +48,22 @@ class Library():
             print('\n')
             num = num + 1
 
+
+# art1 = Article("Title 1", "Text 1")
+# art2 = Article("Title 2", "Text 2")
+# f = open(artFolderName + art1.getTitle(), 'w')
+# cPickle.dump(art1, f)
+# f.close()
+# f = open(artFolderName + art2.getTitle(), 'w')
+# cPickle.dump(art2, f)
+# f.close()
 # myLib = Library()
+# assert myLib.hasArticle("Title 1")
+# assert myLib.hasArticle("Title 2")
+# assert not myLib.hasArticle("Title 3")
+# print(myLib.getArticle(art1.getTitle()).getTitle())
+# print(myLib.getArticle(art1.getTitle()).getTitle())
+# print(myLib.getArticle(art2.getTitle()).getTitle())
+# print(myLib.getArticle(art2.getTitle()).getTitle())
+# print(myLib.getArticle("Title 3"))
 # myLib.dump()
