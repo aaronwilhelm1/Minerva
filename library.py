@@ -1,8 +1,7 @@
 from article import Article
 import cPickle
 import os.path
-
-artFolderName = "articles/"
+from globals import artFolderName
 
 
 class Library():

@@ -1,0 +1,1 @@
+artFolderName = "articles/"
