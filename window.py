@@ -1,4 +1,4 @@
-from Tkinter import Tk, Label, Button, Frame
+from Tkinter import Tk, Label, Button, Frame, Entry, Text, X, END
 
 
 canvas_width = 700
@@ -17,6 +17,7 @@ class GUI:
         self.content = Frame(master, width=canvas_width, height=canvas_height)
         self.content.grid(row=0, column=1, columnspan=4)
 
+        #Setup the menu bar
         self.menuLabel = Label(self.menu, text="Menu")
         self.menuLabel.pack()
         self.importButton = Button(self.menu, text="Import", command=lambda: self.update("import"))
@@ -28,9 +29,42 @@ class GUI:
         self.statsButton = Button(self.menu, text="Stats", command=lambda: self.update("stats"))
         self.statsButton.pack()
 
+        #Setup the possible content pages
+        self.setupImport()
+
+        #default to the import page
+        self.update("import")
+
     def update(self, method):
-        #TODO
-        print("A Button was pushed")
+        self.status = method
+        if(method == "import"):
+            self.importFrame.place(width=canvas_width, height=canvas_height)
+        else:
+            self.importFrame.place_forget()
+        self.content.width = canvas_width
+        self.content.height = canvas_height
+        self.content.grid(row=0, column=1, columnspan=4)
+
+    def setupImport(self):
+        self.importFrame = Frame(self.content, width=canvas_width, height=canvas_height)
+        self.header = Label(self.importFrame, text="Import")
+        self.header.pack()
+        self.title = Label(self.importFrame, text="Title")
+        self.title.pack()
+        self.titleEntry = Entry(self.importFrame, bd=5)
+        self.titleEntry.pack()
+        self.textLabel = Label(self.importFrame, text="Text")
+        self.textLabel.pack()
+        self.text = Text(self.importFrame)
+        self.text.pack(fill=X)
+        self.add = Button(self.importFrame, text="Add to Library", command=lambda: self.contentListener("add"))
+        self.add.pack()
+
+    def contentListener(self, action):
+        if(action == "add"):
+            print(self.titleEntry.get())
+            print(self.text.get(1.0, END))
+
 
 root = Tk()
 my_gui = GUI(root)
