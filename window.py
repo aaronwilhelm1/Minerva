@@ -25,7 +25,7 @@ class GUI:
         self.readButton = Button(self.menu, text="Read", command=lambda: self.update("read"))
         self.readButton.pack()
         self.reviewButton = Button(self.menu, text="Review", command=lambda: self.update("review"))
-        self.readButton.pack()
+        self.reviewButton.pack()
         self.statsButton = Button(self.menu, text="Stats", command=lambda: self.update("stats"))
         self.statsButton.pack()
 
