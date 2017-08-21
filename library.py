@@ -32,7 +32,7 @@ class Library():
         if articleTitle in self.lib:
             return True
         else:
-            return os.path.isfile(artFolderName + articleTitle)
+            return os.path.isfile(artFolderName + articleTitle + artFileEnding)
 
     #prints all of the info at once. Used for debugging purposes
     def dump(self):
