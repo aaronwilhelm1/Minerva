@@ -6,8 +6,6 @@ from os.path import isfile, join, splitext
 from globals import artFolderName, artFileEnding
 
 
-canvas_width = 700
-canvas_height = 700
 debug = True
 
 
@@ -16,10 +14,13 @@ class GUI:
         self.master = master
         master.title("Minerva")
 
+        self.canvas_width = self.master.winfo_screenwidth() - 200
+        self.canvas_height = self.master.winfo_screenheight() - 200
+
         self.menu = Frame(master)
         self.menu.grid(row=0, column=0)
 
-        self.content = Frame(master, width=canvas_width, height=canvas_height)
+        self.content = Frame(master, width=self.canvas_width, height=self.canvas_height)
         self.content.grid(row=0, column=1, columnspan=4)
 
         #Setup the menu bar
@@ -55,19 +56,19 @@ class GUI:
             self.selectFrame.place_forget()
         #place the new frame
         if(method == "import"):
-            self.importFrame.place(width=canvas_width, height=canvas_height)
+            self.importFrame.place(width=self.canvas_width, height=self.canvas_height)
         elif(method == "select"):
-            self.selectFrame.place(width=canvas_width, height=canvas_height)
+            self.selectFrame.place(width=self.canvas_width, height=self.canvas_height)
         elif(method == "read"):
-            self.readFrame.place(width=canvas_width, height=canvas_height)
+            self.readFrame.place(width=self.canvas_width, height=self.canvas_height)
 
-        self.content.width = canvas_width
-        self.content.height = canvas_height
-        self.content.grid(row=0, column=1, columnspan=4)
+        # self.content.width = self.canvas_width
+        # self.content.height = self.canvas_height
+        # self.content.grid(row=0, column=1, columnspan=4)
         self.status = method
 
     def setupImport(self):
-        self.importFrame = Frame(self.content, width=canvas_width, height=canvas_height)
+        self.importFrame = Frame(self.content, width=self.canvas_width, height=self.canvas_height)
         self.header = Label(self.importFrame, text="Import")
         self.header.pack()
         self.title = Label(self.importFrame, text="Title")
@@ -91,7 +92,7 @@ class GUI:
         self.statusLabel.pack()
 
     def setupRead(self):
-        self.readFrame = Frame(self.content, width=canvas_width, height=canvas_height)
+        self.readFrame = Frame(self.content, width=self.canvas_width, height=self.canvas_height)
         self.header = Label(self.readFrame, text="Read")
         self.header.pack()
         self.title = Label(self.readFrame, text="Title")
@@ -101,14 +102,14 @@ class GUI:
         self.textScrollbar = Scrollbar(self.textFrame)
         self.text = Text(self.textFrame, state=DISABLED, yscrollcommand=self.textScrollbar.set)
         # self.text.pack(fill=X)
-        self.text.pack(side=LEFT, fill=Y)
-        self.textScrollbar.pack(side=RIGHT, fill=Y)
+        self.text.pack(side=LEFT, fill=BOTH, expand=1)
+        self.textScrollbar.pack(side=LEFT, fill=Y)
         self.textScrollbar.config(command=self.text.yview)
         self.textFrame.pack(fill=BOTH, expand=1)
         #end the text frame
 
     def setupSelect(self):
-        self.selectFrame = Frame(self.content, width=canvas_width, height=canvas_height)
+        self.selectFrame = Frame(self.content, width=self.canvas_width, height=self.canvas_height)
         self.header = Label(self.selectFrame, text="Make A Selection")
         self.header.pack()
         # make the selection container frame
