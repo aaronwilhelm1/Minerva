@@ -83,10 +83,12 @@ class GUI:
         self.titleEntry.pack()
         self.textLabel = Label(self.importFrame, text="Text")
         self.textLabel.pack()
-        self.text = Text(self.importFrame)
-        self.text.pack(fill=X)
+        self.textEntry = Text(self.importFrame)
+        self.textEntry.pack(fill=X)
         self.add = Button(self.importFrame, text="Add to Library", command=lambda: self.contentListener("add"))
         self.add.pack()
+        self.statusLabel = Label(self.importFrame)
+        self.statusLabel.pack()
 
     def setupRead(self):
         self.readFrame = Frame(self.content, width=canvas_width, height=canvas_height)
@@ -112,8 +114,11 @@ class GUI:
 
     def contentListener(self, action):
         if(action == "add"):
-            self.lib.addArticle(Article(self.titleEntry.get(), self.text.get(1.0, END)))
+            self.lib.addArticle(Article(self.titleEntry.get(), self.textEntry.get(1.0, END)))
             self.selections.insert(END, self.titleEntry.get())
+            self.statusLabel.config(text='Success')
+            self.titleEntry.delete(0, END)
+            self.textEntry.delete(1.0, END)
 
 
 root = Tk()
