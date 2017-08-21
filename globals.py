@@ -1,1 +1,2 @@
 artFolderName = "articles/"
+artFileEnding = ".art"

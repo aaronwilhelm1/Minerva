@@ -1,7 +1,7 @@
 from article import Article
 import cPickle
 import os.path
-from globals import artFolderName
+from globals import artFolderName, artFileEnding
 
 
 class Library():
@@ -11,7 +11,7 @@ class Library():
 
     def addArticle(self, article):
         self.lib[article.getTitle()] = article
-        f = open(artFolderName + article.getTitle(), 'w')
+        f = open(artFolderName + article.getTitle() + artFileEnding, 'w')
         cPickle.dump(article, f)
         f.close()
 
@@ -21,7 +21,7 @@ class Library():
             return self.lib[articleTitle]
         else:
             if self.hasArticle(articleTitle):
-                f = open(artFolderName + articleTitle, 'r')
+                f = open(artFolderName + articleTitle + artFileEnding, 'r')
                 self.lib[articleTitle] = cPickle.load(f)
                 f.close()
                 return self.lib[articleTitle]
@@ -50,10 +50,10 @@ class Library():
 
 # art1 = Article("Title 1", "Text 1")
 # art2 = Article("Title 2", "Text 2")
-# f = open(artFolderName + art1.getTitle(), 'w')
+# f = open(artFolderName + art1.getTitle() + artFileEnding, 'w')
 # cPickle.dump(art1, f)
 # f.close()
-# f = open(artFolderName + art2.getTitle(), 'w')
+# f = open(artFolderName + art2.getTitle() + artFileEnding, 'w')
 # cPickle.dump(art2, f)
 # f.close()
 # myLib = Library()
