@@ -1,4 +1,4 @@
-from Tkinter import Tk, Label, Button, Frame, Entry, Text, X, END, Listbox, SINGLE, NORMAL, DISABLED
+from Tkinter import Tk, Label, Button, Frame, Entry, Text, X, END, Listbox, SINGLE, NORMAL, DISABLED, Scrollbar, RIGHT, Y, BOTH, LEFT
 from library import Library
 from article import Article
 from os import listdir
@@ -73,11 +73,18 @@ class GUI:
         self.title = Label(self.importFrame, text="Title")
         self.title.pack()
         self.titleEntry = Entry(self.importFrame, bd=5)
-        self.titleEntry.pack()
+        self.titleEntry.pack(fill=X)
         self.textLabel = Label(self.importFrame, text="Text")
         self.textLabel.pack()
-        self.textEntry = Text(self.importFrame)
-        self.textEntry.pack(fill=X)
+        # make the entry frame
+        self.textEntryFrame = Frame(self.importFrame)
+        self.textEntryScrollbar = Scrollbar(self.textEntryFrame)
+        self.textEntry = Text(self.textEntryFrame, yscrollcommand=self.textEntryScrollbar.set)
+        self.textEntry.pack(side=LEFT, fill=BOTH, expand=1)
+        self.textEntryScrollbar.pack(side=RIGHT, fill=Y)
+        self.textEntryScrollbar.config(command=self.textEntry.yview)
+        self.textEntryFrame.pack(fill=BOTH, expand=1)
+        # end the entry frame
         self.add = Button(self.importFrame, text="Add to Library", command=lambda: self.contentListener("add"))
         self.add.pack()
         self.statusLabel = Label(self.importFrame)
@@ -89,21 +96,34 @@ class GUI:
         self.header.pack()
         self.title = Label(self.readFrame, text="Title")
         self.title.pack()
-        self.text = Text(self.readFrame, state=DISABLED)
-        self.text.pack(fill=X)
-        self.add = Button(self.readFrame, text="Add to Library", command=lambda: self.contentListener("add"))
-        self.add.pack()
+        # make the text frame
+        self.textFrame = Frame(self.readFrame)
+        self.textScrollbar = Scrollbar(self.textFrame)
+        self.text = Text(self.textFrame, state=DISABLED, yscrollcommand=self.textScrollbar.set)
+        # self.text.pack(fill=X)
+        self.text.pack(side=LEFT, fill=Y)
+        self.textScrollbar.pack(side=RIGHT, fill=Y)
+        self.textScrollbar.config(command=self.text.yview)
+        self.textFrame.pack(fill=BOTH, expand=1)
+        #end the text frame
 
     def setupSelect(self):
         self.selectFrame = Frame(self.content, width=canvas_width, height=canvas_height)
         self.header = Label(self.selectFrame, text="Make A Selection")
         self.header.pack()
-        self.selections = Listbox(self.selectFrame, selectmode=SINGLE, name='selections')
+        # make the selection container frame
+        self.selectionContainerFrame = Frame(self.selectFrame)
+        self.selectionsScrollbar = Scrollbar(self.selectionContainerFrame)
+        self.selections = Listbox(self.selectionContainerFrame, selectmode=SINGLE, name='selections')
         self.selections.bind('<<ListboxSelect>>', self.onselect)
         onlyfiles = [f for f in listdir(artFolderName) if isfile(join(artFolderName, f)) and f.endswith(artFileEnding)]
         for articleTitle in onlyfiles:
             self.selections.insert(END, splitext(articleTitle)[0])
-        self.selections.pack()
+        self.selections.pack(side=LEFT, fill=BOTH, expand=1)
+        self.selectionsScrollbar.pack(side=RIGHT, fill=Y)
+        self.selectionsScrollbar.config(command=self.selections.yview)
+        self.selectionContainerFrame.pack(fill=BOTH, expand=1)
+        # end the selection container frame
 
     def contentListener(self, action):
         if(action == "add"):
@@ -119,7 +139,7 @@ class GUI:
         w = evt.widget
         index = int(w.curselection()[0])
         value = w.get(index)
-        print("Selected article with the title: " + value)
+        # print("Selected article with the title: " + value)
         self.update("read")
         article = self.lib.getArticle(value)
         self.title.config(text=article.getTitle())
