@@ -1,4 +1,4 @@
-from Tkinter import Tk, Label, Button, Frame, Entry, Text, X, END, Listbox, SINGLE
+from Tkinter import Tk, Label, Button, Frame, Entry, Text, X, END, Listbox, SINGLE, NORMAL, DISABLED
 from library import Library
 from article import Article
 from os import listdir
@@ -9,15 +9,6 @@ from globals import artFolderName, artFileEnding
 canvas_width = 700
 canvas_height = 700
 debug = True
-
-
-#create a listener for the ListBox
-def onselect(evt):
-    # Note here that Tkinter passes an event object to onselect()
-    w = evt.widget
-    index = int(w.curselection()[0])
-    value = w.get(index)
-    print("Selected article with the title: " + value)
 
 
 class GUI:
@@ -67,6 +58,8 @@ class GUI:
             self.importFrame.place(width=canvas_width, height=canvas_height)
         elif(method == "select"):
             self.selectFrame.place(width=canvas_width, height=canvas_height)
+        elif(method == "read"):
+            self.readFrame.place(width=canvas_width, height=canvas_height)
 
         self.content.width = canvas_width
         self.content.height = canvas_height
@@ -96,7 +89,7 @@ class GUI:
         self.header.pack()
         self.title = Label(self.readFrame, text="Title")
         self.title.pack()
-        self.text = Text(self.readFrame)
+        self.text = Text(self.readFrame, state=DISABLED)
         self.text.pack(fill=X)
         self.add = Button(self.readFrame, text="Add to Library", command=lambda: self.contentListener("add"))
         self.add.pack()
@@ -106,7 +99,7 @@ class GUI:
         self.header = Label(self.selectFrame, text="Make A Selection")
         self.header.pack()
         self.selections = Listbox(self.selectFrame, selectmode=SINGLE, name='selections')
-        self.selections.bind('<<ListboxSelect>>', onselect)
+        self.selections.bind('<<ListboxSelect>>', self.onselect)
         onlyfiles = [f for f in listdir(artFolderName) if isfile(join(artFolderName, f)) and f.endswith(artFileEnding)]
         for articleTitle in onlyfiles:
             self.selections.insert(END, splitext(articleTitle)[0])
@@ -119,6 +112,21 @@ class GUI:
             self.statusLabel.config(text='Success')
             self.titleEntry.delete(0, END)
             self.textEntry.delete(1.0, END)
+
+    #create a listener for the ListBox
+    def onselect(self, evt):
+        # Note here that Tkinter passes an event object to onselect()
+        w = evt.widget
+        index = int(w.curselection()[0])
+        value = w.get(index)
+        print("Selected article with the title: " + value)
+        self.update("read")
+        article = self.lib.getArticle(value)
+        self.title.config(text=article.getTitle())
+        self.text.config(state=NORMAL)
+        self.text.delete(1.0, END)
+        self.text.insert(1.0, article.getText())
+        self.text.config(state=DISABLED)
 
 
 root = Tk()
