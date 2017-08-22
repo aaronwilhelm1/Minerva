@@ -1,12 +1,17 @@
-from Tkinter import Tk, Label, Button, Frame, Entry, Text, X, END, Listbox, SINGLE, NORMAL, DISABLED, Scrollbar, RIGHT, Y, BOTH, LEFT
+from Tkinter import Tk, Label, Button, Frame, Entry, Text, X, END, Listbox, SINGLE, NORMAL, DISABLED, Scrollbar, RIGHT, Y, BOTH, LEFT, WORD
 from library import Library
 from article import Article
 from os import listdir
 from os.path import isfile, join, splitext
 from globals import artFolderName, artFileEnding
+import string
 
 
-debug = True
+def isMeaningfulCharacter(char):
+    if any(c in char for c in string.punctuation + string.whitespace):
+        return False
+    else:
+        return True
 
 
 class GUI:
@@ -103,6 +108,9 @@ class GUI:
         self.text = Text(self.textFrame, state=DISABLED, yscrollcommand=self.textScrollbar.set)
         # self.text.pack(fill=X)
         self.text.pack(side=LEFT, fill=BOTH, expand=1)
+        #set up the tag so that clicked words are registered
+        self.text.tag_config("all", background="yellow", wrap=WORD)
+        self.text.tag_bind("all", "<Button-1>", self.textClickHandler)
         self.textScrollbar.pack(side=LEFT, fill=Y)
         self.textScrollbar.config(command=self.text.yview)
         self.textFrame.pack(fill=BOTH, expand=1)
@@ -148,6 +156,24 @@ class GUI:
         self.text.delete(1.0, END)
         self.text.insert(1.0, article.getText())
         self.text.config(state=DISABLED)
+        # self.text.tag_add("all", 1.0, END)
+        index = 1.0
+        lastChar = self.text.index("%s-1c" % END)
+        while(index != lastChar):
+            character = self.text.get(index)
+            if isMeaningfulCharacter(character) is True:
+                self.text.tag_add("all", index, "%swordend" % index)
+                index = self.text.index("%swordend" % index)
+            index = self.text.index("%s+1c" % index)
+
+    #create a listener for the readable text
+    def textClickHandler(self, evt):
+        # get the index of the mouse click
+        index = evt.widget.index("@%s,%s" % (evt.x, evt.y))
+        character = self.text.get(index)
+        startOfWord = "%swordstart" % index
+        endOfWord = "%swordend" % index
+        print(self.text.get(startOfWord, endOfWord))
 
 
 root = Tk()
