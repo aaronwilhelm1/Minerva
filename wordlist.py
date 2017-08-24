@@ -30,9 +30,10 @@ class WordData():
 
 
 class WordList():
-    def __init__(self, wordListName):
+    def __init__(self, wordListName, language):
         self.words = {}
         self.name = wordListName
+        self.language = language
 
     def addWord(self, word, translation):
         self.words[word] = WordData(word, translation)
@@ -52,6 +53,12 @@ class WordList():
     def getArticles(self, word):
         return self.words[word].getArticles()
 
+    def getLanguage(self, language):
+        return self.language
+
+    def getSize(self):
+        return len(self.words)
+
     def setTranslation(self, word, newTranslation):
         self.words[word].setTranslation(newTranslation)
 
@@ -62,7 +69,7 @@ class WordList():
         self.words[word].getArticles().append(articleTitle)
 
     def saveWordList(self):
-        f = open(wlFolderName + self.name + wlFileEnding, 'w')
+        f = open(wlFolderName + self.language + self.name + wlFileEnding, 'w')
         cPickle.dump(self, f)
         f.close()
 
@@ -78,7 +85,7 @@ class WordList():
         print("")
 
 
-# wl = WordList("testWordList")
+# wl = WordList("testWordList", "en")
 # wl.addWord("first", "erst")
 # wl.addWord("second", "zweite")
 # wl.addArticle("first", "The title of the first article")
@@ -93,7 +100,8 @@ class WordList():
 # wl.dump()
 # wl.saveWordList()
 # print("Just saved the word list. Now reloading it")
-# f = open(wlFolderName + "testWordList" + wlFileEnding, 'r')
+# f = open(wlFolderName + "en" "testWordList" + wlFileEnding, 'r')
 # wlNew = cPickle.load(f)
 # f.close()
 # wlNew.dump()
+# print(wl.getSize())
