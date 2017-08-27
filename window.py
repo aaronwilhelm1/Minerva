@@ -1,4 +1,4 @@
-from Tkinter import Tk, Label, Button, Frame, Entry, Text, X, END, Listbox, SINGLE, NORMAL, DISABLED, Scrollbar, RIGHT, Y, BOTH, LEFT, WORD
+from Tkinter import Tk, Label, Button, Frame, Entry, Text, X, END, Listbox, SINGLE, NORMAL, DISABLED, Scrollbar, RIGHT, Y, BOTH, LEFT, WORD, Grid, N, S, E, W
 from library import Library
 from article import Article
 from os import listdir
@@ -102,19 +102,32 @@ class GUI:
         self.header.pack()
         self.title = Label(self.readFrame, text="Title")
         self.title.pack()
+        self.contentFrame = Frame(self.readFrame)
         # make the text frame
-        self.textFrame = Frame(self.readFrame)
+        self.textFrame = Frame(self.contentFrame)
         self.textScrollbar = Scrollbar(self.textFrame)
-        self.text = Text(self.textFrame, state=DISABLED, yscrollcommand=self.textScrollbar.set)
+        self.text = Text(self.textFrame, state=DISABLED, yscrollcommand=self.textScrollbar.set, width=0, wrap=WORD, font=("Helvetica",14))
         # self.text.pack(fill=X)
         self.text.pack(side=LEFT, fill=BOTH, expand=1)
         #set up the tag so that clicked words are registered
-        self.text.tag_config("all", background="yellow", wrap=WORD)
+        self.text.tag_config("all", background="yellow")
         self.text.tag_bind("all", "<Button-1>", self.textClickHandler)
         self.textScrollbar.pack(side=LEFT, fill=Y)
         self.textScrollbar.config(command=self.text.yview)
-        self.textFrame.pack(fill=BOTH, expand=1)
-        #end the text frame
+        self.textFrame.grid(row=0, column=0, rowspan=6, columnspan=6, sticky=N+S+E+W)
+        # end the text frame
+        # make the content for to display word info
+        self.display = Text(self.contentFrame, width=0, wrap=WORD, font=("Helvetica",18))
+        self.addButton = Button(self.contentFrame, text="Add", command=lambda: self.contentListener("addTranslation"))
+        self.refetchButton = Button(self.contentFrame, text="Refetch", command=lambda: self.contentListener("refetch"))
+        self.display.grid(row=0, column=6, rowspan=5, columnspan=2, sticky=N+S+E+W)
+        self.addButton.grid(row=5, column=6, sticky=N+S+E+W)
+        self.refetchButton.grid(row=5, column=7, sticky=N+S+E+W)
+        for c in range(8):
+            Grid.columnconfigure(self.contentFrame, c, weight=1)
+        for r in range(6):
+            Grid.rowconfigure(self.contentFrame, r, weight=1)
+        self.contentFrame.pack(fill=BOTH, expand=1)
 
     def setupSelect(self):
         self.selectFrame = Frame(self.content, width=self.canvas_width, height=self.canvas_height)
