@@ -5,6 +5,7 @@ from os import listdir
 from os.path import isfile, join, splitext
 from globals import artFolderName, artFileEnding
 import string
+from yandexTranslateHandler import getTranslation
 
 
 def isMeaningfulCharacter(char):
@@ -106,7 +107,7 @@ class GUI:
         # make the text frame
         self.textFrame = Frame(self.contentFrame)
         self.textScrollbar = Scrollbar(self.textFrame)
-        self.text = Text(self.textFrame, state=DISABLED, yscrollcommand=self.textScrollbar.set, width=0, wrap=WORD, font=("Helvetica",14))
+        self.text = Text(self.textFrame, state=DISABLED, yscrollcommand=self.textScrollbar.set, width=0, wrap=WORD, font=("Helvetica", 14))
         # self.text.pack(fill=X)
         self.text.pack(side=LEFT, fill=BOTH, expand=1)
         #set up the tag so that clicked words are registered
@@ -117,10 +118,12 @@ class GUI:
         self.textFrame.grid(row=0, column=0, rowspan=6, columnspan=6, sticky=N+S+E+W)
         # end the text frame
         # make the content for to display word info
-        self.display = Text(self.contentFrame, width=0, wrap=WORD, font=("Helvetica",18))
+        self.selectedWord = Label(self.contentFrame, width=0, font=("Helvetica", 18), text="Word", pady=5)
+        self.display = Text(self.contentFrame, width=0, wrap=WORD, font=("Helvetica", 16))
         self.addButton = Button(self.contentFrame, text="Add", command=lambda: self.contentListener("addTranslation"))
         self.refetchButton = Button(self.contentFrame, text="Refetch", command=lambda: self.contentListener("refetch"))
-        self.display.grid(row=0, column=6, rowspan=5, columnspan=2, sticky=N+S+E+W)
+        self.selectedWord.grid(row=0, column=6, rowspan=1, columnspan=2, sticky=N+S+E+W)
+        self.display.grid(row=1, column=6, rowspan=4, columnspan=2, sticky=N+S+E+W)
         self.addButton.grid(row=5, column=6, sticky=N+S+E+W)
         self.refetchButton.grid(row=5, column=7, sticky=N+S+E+W)
         for c in range(8):
@@ -183,10 +186,27 @@ class GUI:
     def textClickHandler(self, evt):
         # get the index of the mouse click
         index = evt.widget.index("@%s,%s" % (evt.x, evt.y))
-        character = self.text.get(index)
         startOfWord = "%swordstart" % index
         endOfWord = "%swordend" % index
         print(self.text.get(startOfWord, endOfWord))
+        translations = getTranslation(self.text.get(startOfWord, endOfWord), "de", "en")
+        self.display.delete(1.0, END)
+        for type in translations:
+            self.display.insert(END, type[0] + " (" + type[2] + ")")
+            if(type[3] is not None):
+                self.display.insert(END, " -" + type[3])
+            if(type[4] is not None):
+                self.display.insert(END, " -" + type[4])
+            self.display.insert(END, "\n")
+            for definition in range(len(type[1])):
+                self.display.insert(END, "   " + str(definition + 1) + ".) ")
+                for syn in range(len(type[1][definition])):
+                    self.display.insert(END, type[1][definition][syn])
+                    if not syn == (len(type[1][definition]) - 1):
+                        self.display.insert(END, ", ")
+                    else:
+                        self.display.insert(END, "\n")
+                self.display.insert(END, "\n")
 
 
 root = Tk()
