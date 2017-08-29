@@ -3,7 +3,7 @@ from library import Library
 from article import Article
 from os import listdir
 from os.path import isfile, join, splitext
-from globals import artFolderName, artFileEnding
+from globals import artFolderName, artFileEnding, translate_error_message
 import string
 from yandexTranslateHandler import getTranslation
 
@@ -188,25 +188,35 @@ class GUI:
         index = evt.widget.index("@%s,%s" % (evt.x, evt.y))
         startOfWord = "%swordstart" % index
         endOfWord = "%swordend" % index
-        print(self.text.get(startOfWord, endOfWord))
-        translations = getTranslation(self.text.get(startOfWord, endOfWord), "de", "en")
+        word = self.text.get(startOfWord, endOfWord)
+        translations = getTranslation(word, "de", "en")
         self.display.delete(1.0, END)
+        if len(translations) == 0:
+            self.display.insert(END, translate_error_message(word))
+        else:
+            self.display.insert(END, self.translationToString(translations))
+
+    def translationToString(self, translations):
+        toReturn = ""
         for type in translations:
-            self.display.insert(END, type[0] + " (" + type[2] + ")")
+            toReturn += type[0]
+            if(type[2] is not None):
+                toReturn += " (" + type[2] + ")"
             if(type[3] is not None):
-                self.display.insert(END, " -" + type[3])
+                toReturn += " -" + type[3]
             if(type[4] is not None):
-                self.display.insert(END, " -" + type[4])
-            self.display.insert(END, "\n")
+                toReturn += " -" + type[4]
+            toReturn += "\n"
             for definition in range(len(type[1])):
-                self.display.insert(END, "   " + str(definition + 1) + ".) ")
+                toReturn += "   " + str(definition + 1) + ".) "
                 for syn in range(len(type[1][definition])):
-                    self.display.insert(END, type[1][definition][syn])
+                    toReturn += type[1][definition][syn]
                     if not syn == (len(type[1][definition]) - 1):
-                        self.display.insert(END, ", ")
+                        toReturn += ", "
                     else:
-                        self.display.insert(END, "\n")
-                self.display.insert(END, "\n")
+                        toReturn += "\n"
+                toReturn += "\n"
+        return toReturn
 
 
 root = Tk()
