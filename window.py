@@ -1,9 +1,9 @@
-from Tkinter import Tk, Label, Button, Frame, Entry, Text, X, END, Listbox, SINGLE, NORMAL, DISABLED, Scrollbar, RIGHT, Y, BOTH, LEFT, WORD, Grid, N, S, E, W, SEL
+from Tkinter import *
 from library import Library
 from article import Article
 from os import listdir
 from os.path import isfile, join, splitext
-from globals import artFolderName, artFileEnding, translate_error_message
+from globals import *
 import string
 from yandexTranslateHandler import getTranslation
 from unidecode import unidecode
@@ -85,6 +85,11 @@ class GUI:
         self.titleEntry.pack(fill=X)
         self.textLabel = Label(self.importFrame, text="Text")
         self.textLabel.pack()
+        # make the drop-down menu to select the language
+        self.chosenLanguage = StringVar(self.importFrame)
+        self.chosenLanguage.set(languages[0])
+        self.languageSelection = OptionMenu(self.importFrame, self.chosenLanguage, *languages)
+        self.languageSelection.pack()
         # make the entry frame
         self.textEntryFrame = Frame(self.importFrame)
         self.textEntryScrollbar = Scrollbar(self.textEntryFrame)
@@ -158,7 +163,7 @@ class GUI:
 
     def contentListener(self, action):
         if(action == "add"):
-            self.lib.addArticle(Article(self.titleEntry.get(), self.textEntry.get(1.0, END)))
+            self.lib.addArticle(Article(self.titleEntry.get(), self.textEntry.get(1.0, END), languageCodes[languages.index(self.chosenLanguage.get())]))
             self.selections.insert(END, self.titleEntry.get())
             self.statusLabel.config(text='Success')
             self.titleEntry.delete(0, END)
@@ -170,9 +175,12 @@ class GUI:
         w = evt.widget
         index = int(w.curselection()[0])
         value = w.get(index)
-        # print("Selected article with the title: " + value)
         self.update("read")
         article = self.lib.getArticle(value)
+        try:
+            self.language = article.getLanguage()
+        except AttributeError:
+            self.language = languageCodes[0]
         self.title.config(text=article.getTitle())
         self.text.config(state=NORMAL)
         self.text.delete(1.0, END)
@@ -196,7 +204,7 @@ class GUI:
         startOfWord = "%swordstart" % index
         endOfWord = "%swordend" % index
         word = self.text.get(startOfWord, endOfWord)
-        translations = getTranslation(word, "de", "en")
+        translations = getTranslation(word, self.language, "en")
         self.display.delete(1.0, END)
         if len(translations) == 0:
             self.display.insert(END, translate_error_message(word))
