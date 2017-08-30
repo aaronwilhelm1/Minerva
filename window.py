@@ -1,4 +1,4 @@
-from Tkinter import Tk, Label, Button, Frame, Entry, Text, X, END, Listbox, SINGLE, NORMAL, DISABLED, Scrollbar, RIGHT, Y, BOTH, LEFT, WORD, Grid, N, S, E, W
+from Tkinter import Tk, Label, Button, Frame, Entry, Text, X, END, Listbox, SINGLE, NORMAL, DISABLED, Scrollbar, RIGHT, Y, BOTH, LEFT, WORD, Grid, N, S, E, W, SEL
 from library import Library
 from article import Article
 from os import listdir
@@ -109,12 +109,16 @@ class GUI:
         # make the text frame
         self.textFrame = Frame(self.contentFrame)
         self.textScrollbar = Scrollbar(self.textFrame)
-        self.text = Text(self.textFrame, state=DISABLED, yscrollcommand=self.textScrollbar.set, width=0, wrap=WORD, font=("Helvetica", 14))
+        self.text = Text(self.textFrame, state=DISABLED, yscrollcommand=self.textScrollbar.set, width=0, wrap=WORD, font=("Helvetica", 14), cursor="arrow")
         # self.text.pack(fill=X)
         self.text.pack(side=LEFT, fill=BOTH, expand=1)
         #set up the tag so that clicked words are registered
         self.text.tag_config("all", background="yellow")
         self.text.tag_bind("all", "<Button-1>", self.textClickHandler)
+        self.text.tag_config("title", font=("Helvetica", 16, "bold"))
+        self.text.tag_config("text")
+        self.text.tag_config(SEL, foreground="black")
+        self.text.tag_raise(SEL)
         self.textScrollbar.pack(side=LEFT, fill=Y)
         self.textScrollbar.config(command=self.text.yview)
         self.textFrame.grid(row=0, column=0, rowspan=6, columnspan=6, sticky=N+S+E+W)
@@ -172,7 +176,8 @@ class GUI:
         self.title.config(text=article.getTitle())
         self.text.config(state=NORMAL)
         self.text.delete(1.0, END)
-        self.text.insert(1.0, article.getText())
+        self.text.insert(1.0, article.getTitle() + "\n\n", "title")
+        self.text.insert(END, article.getText(), "text")
         self.text.config(state=DISABLED)
         # self.text.tag_add("all", 1.0, END)
         index = 1.0

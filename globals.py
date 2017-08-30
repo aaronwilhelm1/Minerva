@@ -5,4 +5,4 @@ wlFileEnding = ".wl"
 
 
 def translate_error_message(word):
-    return ("Could not find translation for the word:\n\n" + word + "\n\nPlease write in a definition or just add it to the wordlist.")
+    return (word + "\n   1.) " + word + " [Could not find a definition. Feel free to write your own.]")
