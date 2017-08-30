@@ -6,10 +6,12 @@ from os.path import isfile, join, splitext
 from globals import artFolderName, artFileEnding, translate_error_message
 import string
 from yandexTranslateHandler import getTranslation
+from unidecode import unidecode
 
 
 def isMeaningfulCharacter(char):
-    if any(c in char for c in string.punctuation + string.whitespace):
+    character = unidecode(char)
+    if any(c in character for c in string.punctuation + string.whitespace):
         return False
     else:
         return True
