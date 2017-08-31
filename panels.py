@@ -234,6 +234,17 @@ class ReadPanel(Panel):
                 else:
                     # know it was a new word
                     self.updateTags(word, "new", "learning")
+        elif action == "refetch":
+            index = self.lastLeftClickedIndex
+            startOfWord = "%swordstart" % index
+            endOfWord = "%swordend" % index
+            word = self.text.get(startOfWord, endOfWord).lower()
+            translationObj = getTranslation(word, self.language, "en")
+            translation = self.translationToString(translationObj)
+            if len(translation) == 0:  # Couldn't get anything
+                translation = translate_error_message(word)
+            self.display.delete(1.0, END)
+            self.display.insert(END, translation)
 
     # goes through the text making every instance of the word the new tag
     def updateTags(self, word, prevTag, newTag):
