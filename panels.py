@@ -26,9 +26,9 @@ class ImportPanel(Panel):
         self.header.pack()
         self.title = Label(self.frame, text="Title")
         self.title.pack()
-        self.titleEntry = Entry(self.frame, bd=5)
+        self.titleEntry = Entry(self.frame, bd=5, font=("Helvetica", 12))
         self.titleEntry.pack(fill=X)
-        self.textLabel = Label(self.frame, text="Text")
+        self.textLabel = Label(self.frame, text="Text", font=("Helvetica", 14))
         self.textLabel.pack()
         # make the drop-down menu to select the language
         self.chosenLanguage = StringVar(self.frame)
@@ -38,7 +38,7 @@ class ImportPanel(Panel):
         # make the entry frame
         self.textEntryFrame = Frame(self.frame)
         self.textEntryScrollbar = Scrollbar(self.textEntryFrame)
-        self.textEntry = Text(self.textEntryFrame, yscrollcommand=self.textEntryScrollbar.set)
+        self.textEntry = Text(self.textEntryFrame, yscrollcommand=self.textEntryScrollbar.set, wrap=WORD, font=("Helvetica", 12))
         self.textEntry.pack(side=LEFT, fill=BOTH, expand=1)
         self.textEntryScrollbar.pack(side=RIGHT, fill=Y)
         self.textEntryScrollbar.config(command=self.textEntry.yview)
@@ -186,8 +186,12 @@ class ReadPanel(Panel):
             f.close()
         else:
             self.known = WordList("known", self.language)
+        # Clear the last clicked index since no word has been clicked yet
+        self.lastLeftClickedIndex = None
         # Setup the displays
         self.title.config(text=article.getTitle())
+        self.display.delete(1.0, END)
+        self.display.insert(1.0, read_display_intro)
         self.text.config(state=NORMAL)
         self.text.delete(1.0, END)
         self.text.insert(1.0, article.getTitle() + "\n\n", "title")
@@ -219,32 +223,34 @@ class ReadPanel(Panel):
 
     def contentListener(self, action):
         if action == "addTranslation":
-            index = self.lastLeftClickedIndex
-            startOfWord = "%swordstart" % index
-            endOfWord = "%swordend" % index
-            word = self.text.get(startOfWord, endOfWord).lower()
-            if self.learning.hasWord(word):
-                self.learning.setTranslation(word, self.display.get(1.0, END))
-            else:
-                self.learning.addWord(word, self.display.get(1.0, END))
-                if self.known.hasWord(word):
-                    # know it was a known word
-                    self.known.deleteWord(word)
-                    self.updateTags(word, "known", "learning")
+            if self.lastLeftClickedIndex is not None:
+                index = self.lastLeftClickedIndex
+                startOfWord = "%swordstart" % index
+                endOfWord = "%swordend" % index
+                word = self.text.get(startOfWord, endOfWord).lower()
+                if self.learning.hasWord(word):
+                    self.learning.setTranslation(word, self.display.get(1.0, END))
                 else:
-                    # know it was a new word
-                    self.updateTags(word, "new", "learning")
+                    self.learning.addWord(word, self.display.get(1.0, END))
+                    if self.known.hasWord(word):
+                        # know it was a known word
+                        self.known.deleteWord(word)
+                        self.updateTags(word, "known", "learning")
+                    else:
+                        # know it was a new word
+                        self.updateTags(word, "new", "learning")
         elif action == "refetch":
-            index = self.lastLeftClickedIndex
-            startOfWord = "%swordstart" % index
-            endOfWord = "%swordend" % index
-            word = self.text.get(startOfWord, endOfWord).lower()
-            translationObj = getTranslation(word, self.language, "en")
-            translation = self.translationToString(translationObj)
-            if len(translation) == 0:  # Couldn't get anything
-                translation = translate_error_message(word)
-            self.display.delete(1.0, END)
-            self.display.insert(END, translation)
+            if self.lastLeftClickedIndex is not None:
+                index = self.lastLeftClickedIndex
+                startOfWord = "%swordstart" % index
+                endOfWord = "%swordend" % index
+                word = self.text.get(startOfWord, endOfWord).lower()
+                translationObj = getTranslation(word, self.language, "en")
+                translation = self.translationToString(translationObj)
+                if len(translation) == 0:  # Couldn't get anything
+                    translation = translate_error_message(word)
+                self.display.delete(1.0, END)
+                self.display.insert(END, translation)
 
     # goes through the text making every instance of the word the new tag
     def updateTags(self, word, prevTag, newTag):

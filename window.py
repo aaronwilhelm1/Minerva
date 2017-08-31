@@ -9,6 +9,8 @@ class GUI(object):
         self.master = master
         master.title("Minerva")
 
+        master.option_add("*Font", "Helvetica 14")
+
         self.canvas_width = self.master.winfo_screenwidth() - 200
         self.canvas_height = self.master.winfo_screenheight() - 200
 
