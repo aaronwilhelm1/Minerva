@@ -206,14 +206,16 @@ class ReadPanel(Panel):
             character = self.text.get(index)
             if self.isMeaningfulCharacter(character) is True:
                 endOfWord = "%swordend" % index
-                self.text.tag_add("all", index, endOfWord)
                 word = self.text.get(index, endOfWord).lower()
-                if self.learning.hasWord(word):
-                    self.text.tag_add("learning", index, endOfWord)
-                elif self.known.hasWord(word):
-                    self.text.tag_add("known", index, endOfWord)
-                else:
-                    self.text.tag_add("new", index, endOfWord)
+                # Ignore if it is a digit
+                if not word.isdigit():
+                    self.text.tag_add("all", index, endOfWord)
+                    if self.learning.hasWord(word):
+                        self.text.tag_add("learning", index, endOfWord)
+                    elif self.known.hasWord(word):
+                        self.text.tag_add("known", index, endOfWord)
+                    else:
+                        self.text.tag_add("new", index, endOfWord)
                 index = self.text.index("%swordend" % index)
             index = self.text.index("%s+1c" % index)
 
