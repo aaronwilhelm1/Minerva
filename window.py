@@ -27,8 +27,8 @@ class GUI(object):
         self.importButton.pack()
         self.readButton = Button(self.menu, text="Read", command=lambda: self.update("select"))
         self.readButton.pack()
-        self.reviewButton = Button(self.menu, text="Review", command=lambda: self.update("review"))
-        self.reviewButton.pack()
+        self.saveButton = Button(self.menu, text="Save", command=lambda: self.update("save"))
+        self.saveButton.pack()
         self.statsButton = Button(self.menu, text="Stats", command=lambda: self.update("stats"))
         self.statsButton.pack()
 
@@ -37,30 +37,36 @@ class GUI(object):
         self.readPanel = ReadPanel(self.content, self)
         self.selectPanel = SelectPanel(self.content, self)
 
-        #default to the import page
+        # default to the import page
         self.status = "import"
         self.update("import")
 
         self.lib = Library()
 
-    def update(self, method):
-        #remove the old panel
-        if self.status == "import":
-            self.importPanel.getFrame().place_forget()
-        elif self.status == "read":
-            self.readPanel.saveWordLists()
-            self.readPanel.getFrame().place_forget()
-        elif self.status == "select":
-            self.selectPanel.getFrame().place_forget()
-        #place the new panel
-        if(method == "import"):
-            self.importPanel.getFrame().place(width=self.canvas_width, height=self.canvas_height)
-        elif(method == "select"):
-            self.selectPanel.getFrame().place(width=self.canvas_width, height=self.canvas_height)
-        elif(method == "read"):
-            self.readPanel.getFrame().place(width=self.canvas_width, height=self.canvas_height)
+        # Add the window close listener for automatic saving
+        master.protocol("WM_DELETE_WINDOW", self.closeActions)
 
-        self.status = method
+    def update(self, method):
+        if method == "save":
+            self.readPanel.saveWordLists()
+        else:
+            #remove the old panel
+            if self.status == "import":
+                self.importPanel.getFrame().place_forget()
+            elif self.status == "read":
+                self.readPanel.saveWordLists()
+                self.readPanel.getFrame().place_forget()
+            elif self.status == "select":
+                self.selectPanel.getFrame().place_forget()
+            #place the new panel
+            if(method == "import"):
+                self.importPanel.getFrame().place(width=self.canvas_width, height=self.canvas_height)
+            elif(method == "select"):
+                self.selectPanel.getFrame().place(width=self.canvas_width, height=self.canvas_height)
+            elif(method == "read"):
+                self.readPanel.getFrame().place(width=self.canvas_width, height=self.canvas_height)
+
+            self.status = method
 
     def importArticle(self, article):
         self.lib.addArticle(article)
@@ -70,6 +76,10 @@ class GUI(object):
         self.update("read")
         article = self.lib.getArticle(articleTitle)
         self.readPanel.displayArticle(article)
+
+    def closeActions(self):
+        self.readPanel.saveWordLists()
+        self.master.destroy()
 
 root = Tk()
 my_gui = GUI(root)

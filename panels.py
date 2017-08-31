@@ -100,6 +100,9 @@ class ReadPanel(Panel):
         for r in range(6):
             Grid.rowconfigure(self.contentFrame, r, weight=1)
         self.contentFrame.pack(fill=BOTH, expand=1)
+        # Set the learning lists to None since no language has been chosen yet (and they could try to save it)
+        self.learning = None
+        self.known = None
 
     #create a listener for the readable text
     def textLeftClickHandler(self, evt):
@@ -266,8 +269,10 @@ class ReadPanel(Panel):
             result = self.text.tag_nextrange(prevTag, index)
 
     def saveWordLists(self):
-        self.learning.saveWordList()
-        self.known.saveWordList()
+        if self.learning is not None:
+            self.learning.saveWordList()
+        if self.known is not None:
+            self.known.saveWordList()
 
 
 class SelectPanel(Panel):
