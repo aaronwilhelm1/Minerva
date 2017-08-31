@@ -80,7 +80,7 @@ class ReadPanel(Panel):
         self.text.tag_config("new", background="gold")
         self.text.tag_config("learning", background="steel blue")
         self.text.tag_config("known")
-        self.text.tag_config(SEL, foreground="black")
+        self.text.tag_config(SEL, foreground="black", background="chartreuse4")
         self.text.tag_raise(SEL)
         self.textScrollbar.pack(side=LEFT, fill=Y)
         self.textScrollbar.config(command=self.text.yview)
@@ -89,7 +89,7 @@ class ReadPanel(Panel):
         # make the content for to display word info
         self.selectedWord = Label(self.contentFrame, width=0, font=("Helvetica", 18), text="Word", pady=5)
         self.display = Text(self.contentFrame, width=0, wrap=WORD, font=("Helvetica", 16))
-        self.addButton = Button(self.contentFrame, text="Add", command=lambda: self.contentListener("addTranslation"))
+        self.addButton = Button(self.contentFrame, text="Add/Save", command=lambda: self.contentListener("addTranslation"))
         self.refetchButton = Button(self.contentFrame, text="Refetch", command=lambda: self.contentListener("refetch"))
         self.selectedWord.grid(row=0, column=6, rowspan=1, columnspan=2, sticky=N+S+E+W)
         self.display.grid(row=1, column=6, rowspan=4, columnspan=2, sticky=N+S+E+W)
