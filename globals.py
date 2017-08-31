@@ -9,3 +9,7 @@ languageCodes = ["de", "zh", "es"]
 
 def translate_error_message(word):
     return (word + "\n   1.) " + word + " [Could not find a definition. Feel free to write your own.]")
+
+
+def have_not_translated_message(word):
+    return ("A translation for \"" + word + "\" was never fetched. Fetch one using the button below or type in your own definition")

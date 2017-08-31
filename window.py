@@ -46,6 +46,7 @@ class GUI(object):
         if self.status == "import":
             self.importPanel.getFrame().place_forget()
         elif self.status == "read":
+            self.readPanel.saveWordLists()
             self.readPanel.getFrame().place_forget()
         elif self.status == "select":
             self.selectPanel.getFrame().place_forget()

@@ -1,5 +1,4 @@
 from Tkinter import *
-from library import Library
 from article import Article
 from os import listdir
 from os.path import isfile, join, splitext
@@ -7,6 +6,8 @@ from globals import *
 import string
 from yandexTranslateHandler import getTranslation
 from unidecode import unidecode
+import cPickle
+from wordlist import WordList
 
 
 class Panel(object):
@@ -71,10 +72,14 @@ class ReadPanel(Panel):
         # self.text.pack(fill=X)
         self.text.pack(side=LEFT, fill=BOTH, expand=1)
         #set up the tag so that clicked words are registered
-        self.text.tag_config("all", background="yellow")
-        self.text.tag_bind("all", "<Button-1>", self.textClickHandler)
+        self.text.tag_config("all")
+        self.text.tag_bind("all", "<Button-1>", self.textLeftClickHandler)
+        self.text.tag_bind("all", "<Button-3>", self.textRightClickHandler)
         self.text.tag_config("title", font=("Helvetica", 16, "bold"))
         self.text.tag_config("text")
+        self.text.tag_config("new", background="gold")
+        self.text.tag_config("learning", background="steel blue")
+        self.text.tag_config("known")
         self.text.tag_config(SEL, foreground="black")
         self.text.tag_raise(SEL)
         self.textScrollbar.pack(side=LEFT, fill=Y)
@@ -97,18 +102,49 @@ class ReadPanel(Panel):
         self.contentFrame.pack(fill=BOTH, expand=1)
 
     #create a listener for the readable text
-    def textClickHandler(self, evt):
+    def textLeftClickHandler(self, evt):
         # get the index of the mouse click
         index = evt.widget.index("@%s,%s" % (evt.x, evt.y))
         startOfWord = "%swordstart" % index
         endOfWord = "%swordend" % index
-        word = self.text.get(startOfWord, endOfWord)
-        translations = getTranslation(word, self.language, "en")
-        self.display.delete(1.0, END)
-        if len(translations) == 0:
-            self.display.insert(END, translate_error_message(word))
+        word = self.text.get(startOfWord, endOfWord).lower()
+        if self.learning.hasWord(word):
+            translation = self.learning.getTranslation(word)
+        elif self.known.hasWord(word):
+            translation = self.known.getTranslation(word)
         else:
-            self.display.insert(END, self.translationToString(translations))
+            # We have never seen this word before
+            translationObj = getTranslation(word, self.language, "en")
+            translation = self.translationToString(translationObj)
+            if len(translation) == 0:  # Couldn't get anything
+                translation = translate_error_message(word)
+        self.display.delete(1.0, END)
+        self.display.insert(END, translation)
+        self.lastLeftClickedIndex = index
+
+    #create a listener for the readable text
+    def textRightClickHandler(self, evt):
+        # get the index of the mouse click
+        index = evt.widget.index("@%s,%s" % (evt.x, evt.y))
+        tags = self.text.tag_names(index)
+        startOfWord = "%swordstart" % index
+        endOfWord = "%swordend" % index
+        word = self.text.get(startOfWord, endOfWord).lower()
+        if "new" in tags:
+            self.known.addWord(word, have_not_translated_message(word))
+            self.text.tag_add("known", startOfWord, endOfWord)
+            self.updateTags(word, "new", "known")
+        elif "learning" in tags:
+            self.known.addWord(word, self.learning.getTranslation(word))
+            self.learning.deleteWord(word)
+            self.text.tag_add("known", startOfWord, endOfWord)
+            self.updateTags(word, "learning", "known")
+        else:
+            # Word must be known, so put it back into learning words
+            self.learning.addWord(word, self.known.getTranslation(word))
+            self.known.deleteWord(word)
+            self.text.tag_add("learning", startOfWord, endOfWord)
+            self.updateTags(word, "known", "learning")
 
     def translationToString(self, translations):
         toReturn = ""
@@ -137,6 +173,20 @@ class ReadPanel(Panel):
             self.language = article.getLanguage()
         except AttributeError:
             self.language = languageCodes[0]
+        # Setup the word lists
+        if isfile(wlFolderName + self.language + "learning" + wlFileEnding):
+            f = open(wlFolderName + self.language + "learning" + wlFileEnding, 'r')
+            self.learning = cPickle.load(f)
+            f.close()
+        else:
+            self.learning = WordList("learning", self.language)
+        if isfile(wlFolderName + self.language + "known" + wlFileEnding):
+            f = open(wlFolderName + self.language + "known" + wlFileEnding, 'r')
+            self.known = cPickle.load(f)
+            f.close()
+        else:
+            self.known = WordList("known", self.language)
+        # Setup the displays
         self.title.config(text=article.getTitle())
         self.text.config(state=NORMAL)
         self.text.delete(1.0, END)
@@ -148,7 +198,15 @@ class ReadPanel(Panel):
         while(index != lastChar):
             character = self.text.get(index)
             if self.isMeaningfulCharacter(character) is True:
-                self.text.tag_add("all", index, "%swordend" % index)
+                endOfWord = "%swordend" % index
+                self.text.tag_add("all", index, endOfWord)
+                word = self.text.get(index, endOfWord).lower()
+                if self.learning.hasWord(word):
+                    self.text.tag_add("learning", index, endOfWord)
+                elif self.known.hasWord(word):
+                    self.text.tag_add("known", index, endOfWord)
+                else:
+                    self.text.tag_add("new", index, endOfWord)
                 index = self.text.index("%swordend" % index)
             index = self.text.index("%s+1c" % index)
 
@@ -160,8 +218,39 @@ class ReadPanel(Panel):
             return True
 
     def contentListener(self, action):
-        #TODO: Replace with valid listeners
-        print("Content listener for read panel was called but nothing is here yet!")
+        if action == "addTranslation":
+            index = self.lastLeftClickedIndex
+            startOfWord = "%swordstart" % index
+            endOfWord = "%swordend" % index
+            word = self.text.get(startOfWord, endOfWord).lower()
+            if self.learning.hasWord(word):
+                self.learning.setTranslation(word, self.display.get(1.0, END))
+            else:
+                self.learning.addWord(word, self.display.get(1.0, END))
+                if self.known.hasWord(word):
+                    # know it was a known word
+                    self.known.deleteWord(word)
+                    self.updateTags(word, "known", "learning")
+                else:
+                    # know it was a new word
+                    self.updateTags(word, "new", "learning")
+
+    # goes through the text making every instance of the word the new tag
+    def updateTags(self, word, prevTag, newTag):
+        index = 1.0
+        result = self.text.tag_nextrange(prevTag, index)
+        while(len(result) != 0):
+            startOfWord, endOfWord = result
+            foundWord = self.text.get(startOfWord, endOfWord).lower()
+            if word.lower() == foundWord:
+                self.text.tag_remove(prevTag, startOfWord, endOfWord)
+                self.text.tag_add(newTag, startOfWord, endOfWord)
+            index = self.text.index("%s+1c" % endOfWord)
+            result = self.text.tag_nextrange(prevTag, index)
+
+    def saveWordLists(self):
+        self.learning.saveWordList()
+        self.known.saveWordList()
 
 
 class SelectPanel(Panel):
