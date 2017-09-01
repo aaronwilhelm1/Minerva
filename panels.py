@@ -305,3 +305,52 @@ class SelectPanel(Panel):
         index = int(w.curselection()[0])
         value = w.get(index)
         self.controller.articleSelected(value)
+
+
+class StatsPanel(Panel):
+    def __init__(self, masterPanel, controller):
+        super(StatsPanel, self).__init__(masterPanel, controller)
+        self.header = Label(self.frame, text="Statistics")
+        self.header.pack()
+        # make the selection container frame
+        self.statsContainerFrame = Frame(self.frame)
+        self.statsScrollbar = Scrollbar(self.statsContainerFrame)
+        self.statsScrollbar.pack(side=RIGHT, fill=Y)
+        # self.statsScrollbar.config(command=self.statsContainerFrame.yview)
+        self.statsContainerFrame.pack(fill=BOTH, expand=1)
+
+    # Override the parent method since we need to dynamically generate this (# of languages can change)
+    def getFrame(self):
+        onlyfiles = [f for f in listdir(wlFolderName) if isfile(join(wlFolderName, f)) and f.endswith(wlFileEnding)]
+        langCodes = []
+        for file in onlyfiles:
+            langCode = file[0:2]
+            if langCode not in langCodes:
+                langCodes.append(langCode)
+        # convert each of the languageCodes to their readable text form
+        langs = []
+        for langCode in langCodes:
+            langs.append(languages[languageCodes.index(langCode)])
+        labels = self.statsContainerFrame.winfo_children()
+        for lab in labels:
+            lab.destroy()
+        for x in range(len(langs)):
+            f = open(wlFolderName + langCodes[x] + "learning" + wlFileEnding, 'r')
+            learning = cPickle.load(f)
+            f.close()
+            f = open(wlFolderName + langCodes[x] + "known" + wlFileEnding, 'r')
+            known = cPickle.load(f)
+            f.close()
+            learningLabel = Label(self.statsContainerFrame, text="# of Words in " + langs[x] + u" Learning List\u00ae:", borderwidth=5, relief="solid", font=("Helvetica", 16))
+            learnNum = Label(self.statsContainerFrame, text=str(learning.getSize()), borderwidth=5, relief="solid", font=("Helvetica", 16))
+            knownLabel =  Label(self.statsContainerFrame, text="# of Words in " + langs[x] + u" Known List:", borderwidth=5, relief="solid", font=("Helvetica", 16))
+            knownNum = Label(self.statsContainerFrame, text=str(known.getSize()), borderwidth=5, relief="solid", font=("Helvetica", 16))
+            learningLabel.grid(row=(x * 2), column=0, sticky=N+S+E+W)
+            learnNum.grid(row=(x * 2), column=1, sticky=N+S+E+W)
+            knownLabel.grid(row=((x * 2) + 1), column=0, sticky=N+S+E+W)
+            knownNum.grid(row=((x * 2) + 1), column=1, sticky=N+S+E+W)
+        for c in range(2):
+            Grid.columnconfigure(self.statsContainerFrame, c, weight=1)
+        for r in range(len(langs) * 2):
+            Grid.rowconfigure(self.statsContainerFrame, r, weight=1)
+        return super(StatsPanel, self).getFrame()

@@ -36,6 +36,7 @@ class GUI(object):
         self.importPanel = ImportPanel(self.content, self)
         self.readPanel = ReadPanel(self.content, self)
         self.selectPanel = SelectPanel(self.content, self)
+        self.statsPanel = StatsPanel(self.content, self)
 
         # default to the import page
         self.status = "import"
@@ -58,6 +59,8 @@ class GUI(object):
                 self.readPanel.getFrame().place_forget()
             elif self.status == "select":
                 self.selectPanel.getFrame().place_forget()
+            elif self.status == "stats":
+                self.statsPanel.getFrame().place_forget()
             #place the new panel
             if(method == "import"):
                 self.importPanel.getFrame().place(width=self.canvas_width, height=self.canvas_height)
@@ -65,6 +68,8 @@ class GUI(object):
                 self.selectPanel.getFrame().place(width=self.canvas_width, height=self.canvas_height)
             elif(method == "read"):
                 self.readPanel.getFrame().place(width=self.canvas_width, height=self.canvas_height)
+            elif(method == "stats"):
+                self.statsPanel.getFrame().place(width=self.canvas_width, height=self.canvas_height)
 
             self.status = method
 
