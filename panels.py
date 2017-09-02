@@ -38,11 +38,14 @@ class ImportPanel(Panel):
         # make the entry frame
         self.textEntryFrame = Frame(self.frame)
         self.textEntryScrollbar = Scrollbar(self.textEntryFrame)
-        self.textEntry = Text(self.textEntryFrame, yscrollcommand=self.textEntryScrollbar.set, wrap=WORD, font=("Helvetica", 12))
+        self.textEntry = Text(self.textEntryFrame, yscrollcommand=self.textEntryScrollbar.set, wrap=WORD, font=("Helvetica", 14))
         self.textEntry.pack(side=LEFT, fill=BOTH, expand=1)
         self.textEntryScrollbar.pack(side=RIGHT, fill=Y)
         self.textEntryScrollbar.config(command=self.textEntry.yview)
         self.textEntryFrame.pack(fill=BOTH, expand=1)
+        self.textEntry.bind("<Button-1>", self.textLeftClickHandler)
+        self.haveClicked = False
+        self.textEntry.insert(END, import_hint)
         # end the entry frame
         self.add = Button(self.frame, text="Add to Library", command=lambda: self.contentListener("add"))
         self.add.pack()
@@ -55,6 +58,12 @@ class ImportPanel(Panel):
             self.statusLabel.config(text='Success')
             self.titleEntry.delete(0, END)
             self.textEntry.delete(1.0, END)
+
+    def textLeftClickHandler(self, evt):
+        if self.haveClicked is False:
+            self.textEntry.delete(1.0, END)
+            self.haveClicked = True
+            self.textEntry["font"] = ("Helvetica", 12)
 
 
 class ReadPanel(Panel):

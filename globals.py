@@ -7,6 +7,9 @@ artFileEnding = ".art"
 wlFolderName = rootDirectory + "wordlists/"
 wlFileEnding = ".wl"
 
+import_hint = "Copy and paste an article into the \"Titl\"e and \"Text\" entries.\n\nAlso, be sure to set the language of the article from the drop down menu above.\n\n" \
+    + "When finished, click the \"Add to Library\" button below to add it your reading library."
+
 read_display_intro = u"Words highlighted in gold are new words. Words highlighted in blue are words in the Learning List\u00ae.\n\n" \
     + u"Left click on a word on the left to display its definition here.\nIf you want, edit the definition and then click \"Add/Save\" to add it to your Learning List.\n\n" \
     + u"If you have already saved an alternate defintion but want to see the original translation, click \"Refetch\". To save the word with the original translation, then hit \"Add/Save\".\n\n" \
