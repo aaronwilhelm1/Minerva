@@ -1,13 +1,14 @@
 import os
 
-
 rootDirectory = os.path.expanduser("~/Minerva/")
 artFolderName = rootDirectory + "articles/"
 artFileEnding = ".art"
 wlFolderName = rootDirectory + "wordlists/"
 wlFileEnding = ".wl"
+resourceDirectory = "res/"
+icoFile = resourceDirectory + "minerva_icon.ico"
 
-import_hint = "Copy and paste an article into the \"Titl\"e and \"Text\" entries.\n\nAlso, be sure to set the language of the article from the drop down menu above.\n\n" \
+import_hint = "Copy and paste an article into the \"Title\" and \"Text\" entries.\n\nAlso, be sure to set the language of the article from the drop down menu above.\n\n" \
     + "When finished, click the \"Add to Library\" button below to add it your reading library."
 
 read_display_intro = u"Words highlighted in gold are new words. Words highlighted in blue are words in the Learning List\u00ae.\n\n" \

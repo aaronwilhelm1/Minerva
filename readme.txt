@@ -5,9 +5,9 @@ Dependencies: Requests (HTTP for Humans), Unidecode
 Check the builds directory for an executable for your machine. If not present, a build can be generated using PyInstaller once the necessary dependencies have been installed.
 
 For Windows or Mac, execute the following command from within the project directory:
-pyinstaller window.py -n Minerva -w -F
+pyinstaller window.py -n Minerva -w -F --icon res/minerva_icon.ico
 
 For Unix, execute the following command from within the project directory:
-pyinstaller window.py -n Minerva -F
+pyinstaller window.py -n Minerva -F --icon res/minerva_icon.ico
 
 The generated executable should be runnable from any directory on your machine.
