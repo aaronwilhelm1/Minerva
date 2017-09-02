@@ -20,6 +20,8 @@ class GUI(object):
         self.content = Frame(master, width=self.canvas_width, height=self.canvas_height)
         self.content.grid(row=0, column=1, columnspan=4)
 
+        self.setUpDirectories()
+
         #Setup the menu bar
         self.menuLabel = Label(self.menu, text="Menu")
         self.menuLabel.pack()
@@ -85,6 +87,23 @@ class GUI(object):
     def closeActions(self):
         self.readPanel.saveWordLists()
         self.master.destroy()
+
+    def setUpDirectories(self):
+        try:
+            os.makedirs(rootDirectory)
+        except OSError:
+            if not os.path.isdir(rootDirectory):
+                raise
+        try:
+            os.makedirs(artFolderName)
+        except OSError:
+            if not os.path.isdir(artFolderName):
+                raise
+        try:
+            os.makedirs(wlFolderName)
+        except OSError:
+            if not os.path.isdir(wlFolderName):
+                raise
 
 root = Tk()
 my_gui = GUI(root)

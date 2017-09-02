@@ -1,7 +1,12 @@
-artFolderName = "articles/"
+import os
+
+
+rootDirectory = os.path.expanduser("~/Minerva/")
+artFolderName = rootDirectory + "articles/"
 artFileEnding = ".art"
-wlFolderName = "wordlists/"
+wlFolderName = rootDirectory + "wordlists/"
 wlFileEnding = ".wl"
+
 read_display_intro = u"Words highlighted in gold are new words. Words highlighted in blue are words in the Learning List\u00ae.\n\n" \
     + u"Left click on a word on the left to display its definition here.\nIf you want, edit the definition and then click \"Add/Save\" to add it to your Learning List.\n\n" \
     + u"If you have already saved an alternate defintion but want to see the original translation, click \"Refetch\". To save the word with the original translation, then hit \"Add/Save\".\n\n" \
