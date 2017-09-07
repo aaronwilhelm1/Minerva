@@ -42,13 +42,14 @@ class ImportPanel(Panel):
         self.textEntry.pack(side=LEFT, fill=BOTH, expand=1)
         self.textEntryScrollbar.pack(side=RIGHT, fill=Y)
         self.textEntryScrollbar.config(command=self.textEntry.yview)
-        self.textEntryFrame.pack(fill=BOTH, expand=1)
         self.textEntry.bind("<Button-1>", self.textLeftClickHandler)
         self.haveClicked = False
         self.textEntry.insert(END, import_hint)
         # end the entry frame
         self.add = Button(self.frame, text="Add to Library", command=lambda: self.contentListener("add"))
-        self.add.pack()
+        self.add.pack(side=BOTTOM)
+        # pack the text entry frame so it doesn't swell up too big
+        self.textEntryFrame.pack(fill=BOTH, expand=1)
         self.statusLabel = Label(self.frame)
         self.statusLabel.pack()
 
