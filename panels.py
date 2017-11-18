@@ -4,7 +4,7 @@ from os import listdir
 from os.path import isfile, join, splitext
 from globals import *
 import string
-from yandexTranslateHandler import getTranslation
+from hybridTranslateHandler import getTranslation
 from unidecode import unidecode
 import cPickle
 from wordlist import WordList
