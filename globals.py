@@ -1,4 +1,15 @@
-import os
+import os, sys
+
+
+def resource_path(relative_path):
+    # Get absolute path to resource, works for dev and for PyInstaller
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 rootDirectory = os.path.expanduser("~/Minerva/")
 artFolderName = rootDirectory + "articles/"
@@ -6,7 +17,8 @@ artFileEnding = ".art"
 wlFolderName = rootDirectory + "wordlists/"
 wlFileEnding = ".wl"
 resourceDirectory = "res/"
-icoFile = resourceDirectory + "minerva_icon.ico"
+icoFile = resource_path(resourceDirectory + "minerva_icon.ico")
+deToEnDictionary = resource_path(resourceDirectory + "deToEnDict.txt")
 
 import_hint = "Copy and paste an article into the \"Title\" and \"Text\" entries.\n\nAlso, be sure to set the language of the article from the drop down menu above.\n\n" \
     + "When finished, click the \"Add to Library\" button below to add it your reading library."
