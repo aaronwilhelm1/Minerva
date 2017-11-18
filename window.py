@@ -8,6 +8,7 @@ class GUI(object):
     def __init__(self, master):
         self.master = master
         master.title("Minerva")
+        master.iconbitmap(icoFile)
 
         master.option_add("*Font", "Helvetica 14")
 
