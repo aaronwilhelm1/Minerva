@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 from Tkinter import *
 from article import Article
 from os import listdir
@@ -231,7 +234,7 @@ class ReadPanel(Panel):
 
     def isMeaningfulCharacter(self, char):
         character = unidecode(char)
-        if any(c in character for c in string.punctuation + string.whitespace):
+        if any(c in character for c in string.punctuation + string.whitespace + u"„“"):
             return False
         else:
             return True
